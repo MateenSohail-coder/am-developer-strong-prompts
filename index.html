@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptVault - Dark Cloud Viewer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Compact Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-left">
+        <i class="fas fa-brain nav-icon"></i>
+        <span class="nav-title">PromptVault</span>
+      </div>
+      <div class="nav-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search prompts...">
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Dark Cloud Prompts</h1>
+      <p>Copy-ready AI prompts in dark cloudy style.</p>
+      <div class="hero-stats">
+        <span><strong id="promptCount">3</strong> Prompts</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="container">
+      <div class="prompts-grid" id="promptsGrid"></div>
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <i class="fas fa-cloud"></i>
+        <h3>No matches</h3>
+        <p>Adjust search</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2024 PromptVault</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
