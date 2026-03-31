@@ -181,19 +181,20 @@ body {
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
-  white-space: normal;
+  white-space: pre-line;
   position: relative;
 }
 
 .prompt-preview::after {
   content: '... copy for full';
   position: absolute;
-  bottom: 0;
+  bottom: 0.25rem;
   right: 0;
-  background: var(--card);
-  padding-left: 0.5rem;
+  background: linear-gradient(to left, var(--card), transparent);
+  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
   font-size: 0.85rem;
   color: var(--text-dim);
+  pointer-events: none;
 }
 
 .prompt-footer {
