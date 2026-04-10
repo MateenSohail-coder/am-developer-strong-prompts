@@ -1,36 +1,382 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PromptVault - Brutalist</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Library</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0;    font-family: monospace;
+ }
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  :root {
+    --bg: #0e0e10;
+    --bg2: #161618;
+    --bg3: #1e1e22;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.14);
+    --text-primary: #f0f0f2;
+    --text-secondary: #9898a8;
+    --text-muted: #55556a;
+    --accent: #7f77dd;
+    --accent-dim: rgba(127,119,221,0.12);
+    --accent-hover: rgba(127,119,221,0.22);
+    --green: #1d9e75;
+    --green-dim: rgba(29,158,117,0.13);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 36px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .logo-box {
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    border: 3px solid whitesmoke;
+  }
+
+  .logo h1 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--text-primary);
+  }
+
+  .badge {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    max-width: 340px;
+    margin-left: auto;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    padding: 8px 12px 8px 33px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--text-muted); }
+
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .card:hover {
+    border-color: var(--border-hover);
+    background: var(--bg3);
+  }
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .card-num {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .card-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+  }
+
+  .preview {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chars {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .btn-copy {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(127,119,221,0.22);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 13px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .btn-copy:hover { background: var(--accent-hover); }
+  .btn-copy:active { transform: scale(0.97); }
+  .btn-copy.copied {
+    background: var(--green-dim);
+    border-color: rgba(29,158,117,0.28);
+    color: var(--green);
+  }
+
+  .btn-copy svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 16px; }
+    .search-wrap { max-width: 100%; margin-left: 0; order: 4; width: 100%; }
+    main { padding: 18px 12px 40px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
 
-
-
-<section class="hero brutalist-hero">
-  <h1 class="glitch">BRUTALIST PROMPT VAULT</h1>
-  <p class="hero-subtitle">Copy-ready AI prompts</p>
-  <span id="promptCount" class="prompt-count"></span> PROMPTS
-</section>
-
-<main class="container brutalist-container">
-  <div id="promptsGrid" class="prompts-grid brutalist-grid"></div>
-
-  <div id="emptyState" class="empty-state brutalist-empty" style="display:none">
-    <h3>NO RESULTS</h3>
-    <p>Try another search</p>
+<header>
+  <div class="logo">
+    <div class="logo-box">P</div>
+    <h1>Prompt Library</h1>
   </div>
+  <span class="badge" id="badge">0 prompts</span>
+  <div class="search-wrap">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+      <circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search by title, description, or content…" autocomplete="off">
+  </div>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
 </main>
 
-<div id="toastContainer" class="toast-container brutalist-toast-container"></div>
+<script>
+const PROMPTS = [
+  {
+    id: 1,
+    title: "For all details of ring",
+    description: "prompt to generate the deep details of a ring.",
+    prompt:"Analyze this ring image in extreme forensic detail. Do NOT describe what a typical ring looks like — describe ONLY what you can literally see in this specific image. Produce a structured report with these exact sections: 1. BAND SHAPE & GEOMETRY - Is the band perfectly circular or does it appear oval/irregular in the photo? - What is the approximate band width and thickness? - Any engravings, grooves, or texture on the band? Describe exact position. 2. COMPLETE STONE INVENTORY List every single stone you can detect. For each stone write: - Stone number (1, 2, 3...) - Type: diamond / colored gem / unknown - Cut shape: round / princess / cushion / oval / emerald / baguette / other - Size: large / medium / small / micro / barely visible - Position: center / left shoulder / right shoulder / pavé row / channel / band side - Setting type: prong / bezel / channel / pavé / invisible - Number of visible prongs (if any) Include ALL stones — even if they are tiny, partially hidden, or barely visible. Do not skip any. 3. CIRCULAR OR CURVED ELEMENTS List any circular, rounded, or curved design elements that are NOT stones (e.g. halo rings, circular engravings, curved prong bases, round gallery details). 4. DENSE CLUSTER AREAS Identify any areas where multiple small stones or design elements are packed closely together. Describe exact location and approximate count. 5. SUPPORT STRUCTURE VISIBLE Describe any existing prongs, claws, or bezels visible in the image — their height, shape, and how many per stone. Output this as a numbered list exactly as structured above. Be precise. Do not generalize."
+  },
+  {
+    id: 2,
+    title: "1 View Ring Image Reconstruction - Step 2",
+    description: "prompt to create a perfect ring image for AI 3D modeling",
+    prompt:"STRICT RECONSTRUCTION ONLY. ZERO CREATIVE DECISIONS PERMITTED. You are operating as a technical CAD reference generator, not an artist. You must not invent, predict, stylize, or deviate from the source image or the analysis report below. Every output element must be traceable to either the image or the report. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ REFERENCE DATA (from analysis — treat as ground truth): ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ [PASTE ANALYSIS REPORT HERE] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TASK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Using the source image AND the analysis report above as your only references, generate a single high-resolution ring reference image optimized for Tripo AI 3D model generation. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ GEOMETRY — NON-NEGOTIABLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * The ring band must be a MATHEMATICALLY PERFECT CIRCLE * Inner hole and outer band edge must be perfectly concentric * Band thickness must be identical at every point around the circumference * No oval, skewing, warping, or distortion * View: clean 3/4 angle — design face visible + band curvature visible * No perspective distortion * Any circular decorative element must remain perfectly circular ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ WEIGHT CONTROL — NON-NEGOTIABLE (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ The ring MUST visually and structurally represent a **lightweight, wearable design**. THICKNESS RULE: * The band must NOT appear bulky, oversized, or “nigar” (heavy/thick) * The band must NOT be ultra-thin or fragile * Maintain a **balanced medium-light thickness** VISUAL MASS RULE: * Metal volume must appear controlled and efficient — no excess bulk * Avoid heavy solid blocks of metal unless explicitly present in source * Internal and external proportions must suggest reduced weight STRUCTURAL SLENDERNESS: * Supports (prongs, bezels, etc.) must be **slender but tall** * Reduce width where needed, NEVER reduce height * Maintain strength appearance without bulkiness DENSE AREA CONTROL: * In pavé or clustered regions: • keep elements thin and separated • prevent visual crowding that creates heavy appearance FINAL WEIGHT IMPRESSION (MANDATORY): * The ring must read visually as: ✓ lightweight ✓ balanced ✗ NOT bulky ✗ NOT ضخيم / heavy If the reconstructed form appears heavy, it is considered INVALID. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ABSOLUTE DESIGN LOCK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Reproduce EVERY surface detail exactly * No simplification * No additions * No redesign ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STONE REMOVAL — ALL STONES FROM REPORT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Remove ALL stones (including micro) For EACH stone: * Create exact hole (shape, size, position) * Sharp edges, visible depth MICRO STONE RULE: * Every micro stone → individual hole * No merging ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SUPPORT STRUCTURES — STRICT RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HEIGHT RULE: * All supports must be clearly taller than surface SHARPNESS RULE: * Hard edges only SEPARATION RULE (CRITICAL): * No touching, no merging ALIGNMENT RULE: * Perfectly centered NO CLUSTER RULE: * Thin supports in dense areas * Maintain spacing WEIGHT LINK RULE: * Supports must NOT appear thick or bulky * Prefer slender, precise geometry ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BLUR PREVENTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Maximum sharpness * No blur of any kind ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ LIGHTING & BACKGROUND ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * White / light gray background * Flat lighting * No reflections ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TRIPO AI OPTIMIZATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Clear readable geometry * Strong contrast between: • surface vs holes • surface vs supports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FINAL ENFORCEMENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * ONLY reproduce what exists in source + report * NO creativity * Every micro stone → hole * Every support → tall, sharp, separated * EVERY EDGE → crisp WEIGHT ENFORCEMENT: * The final ring MUST appear lightweight and wearable * Any bulky or heavy-looking result is INVALID This is a precision 3D modeling reference — accuracy AND weight control are both mandatory."
+  },
+  {
+    id: 3,
+    title: "For all details of 4 view ring",
+    description: "prompt to generate the deep details of a ring.",
+    prompt:"Analyze this ring image in extreme forensic detail. Do NOT describe what a typical ring looks like — describe ONLY what you can literally see in this specific image. Produce a structured report with these exact sections: 1. BAND SHAPE & GEOMETRY - Is the band perfectly circular or does it appear oval/irregular in the photo? - Approximate band width and thickness - Any engravings, grooves, or texture on the band — describe exact position - Does the band taper, widen, or stay consistent? 2. COMPLETE STONE INVENTORY List EVERY single stone you can detect. For each stone write: - Stone number (1, 2, 3...) - Type: diamond / colored gem / unknown - Cut shape: round / princess / cushion / oval / emerald / baguette / other - Size: large / medium / small / micro / barely visible - Position: center / left shoulder / right shoulder / pavé row / channel / band side / halo - Setting type: prong / bezel / channel / pavé / invisible - Number of visible prongs if any Include ALL stones — even tiny, partially hidden, or barely visible ones. Do not skip any. 3. CIRCULAR OR CURVED ELEMENTS List any circular, rounded, or curved design elements that are NOT stones — halo rings, circular engravings, curved prong bases, round gallery details. 4. DENSE CLUSTER AREAS Identify areas where multiple small stones or elements are closely packed. State exact location and approximate stone count in each cluster. 5. ALL 4 VIEWS — WHAT SHOULD BE VISIBLE Based on the front image, describe what you expect to see in: - BACK view: any engravings, plain band, hallmarks - TOP view: inner band, opening, top face layout - BOTTOM view: underside, gallery, base details 6. SUPPORT STRUCTURES VISIBLE Describe any existing prongs, claws, or bezels — their height, shape, count per stone. Output this as a numbered list exactly as structured above. Be precise. Do not generalize. Do not skip any stone no matter how small."
+  },
+  {
+    id: 4,
+    title: "4 View Ring Image Reconstruction",
+    description: "prompt to create a perfect ring image for AI 3D modeling",
+    prompt:"STRICT RECONSTRUCTION ONLY. ZERO CREATIVE DECISIONS PERMITTED. You are operating as a technical CAD reference generator, not an artist. You must not invent, predict, stylize, or deviate from the source image or the analysis report below. Every output element must be traceable to either the image or the report. If something is unclear in the image, reproduce only its visible boundary — never guess its interior. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ REFERENCE DATA (from analysis — treat as ground truth): ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ [PASTE ANALYSIS REPORT HERE] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TASK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Using the source image AND the analysis report above as your only references, generate a 4-view multi-angle reference image set optimized for Tripo AI image-to-3D model generation. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MULTI-VIEW OUTPUT — 4 VIEWS IN ONE IMAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Generate exactly 4 views arranged in a single image: 1. FRONT (3/4 angle) 2. BACK 3. TOP (plan view) 4. BOTTOM Label each view clearly: FRONT / BACK / TOP / BOTTOM CONSISTENCY LAW — ALL 4 VIEWS MUST MATCH: * Identical design patterns and engravings in every view * Identical support structure height, thickness, and placement * Identical stone hole size, shape, and position * Identical band geometry and proportions Any inconsistency = FAILURE. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ GEOMETRY — PERFECT CIRCLE IN ALL VIEWS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Band must be a mathematically perfect circle in every view * Inner and outer edges must be perfectly concentric * Band thickness must be identical at all points * No distortion, no skewing, no oval shape * All circular decorative elements must remain perfectly circular ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ WEIGHT CONTROL — NON-NEGOTIABLE (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ The ring MUST visually and structurally represent a **lightweight, wearable design** in ALL 4 views. THICKNESS RULE: * Band must NOT appear bulky, ضخيم, or “nigar” * Band must NOT be ultra-thin or fragile * Maintain balanced **medium-light thickness** across ALL views UNIFORM WEIGHT RULE: * Thickness must remain visually consistent in FRONT, BACK, TOP, and BOTTOM * No hidden bulk in underside or inner band * No localized thick zones unless explicitly present in report VISUAL MASS CONTROL: * Metal volume must appear controlled and efficient * Avoid large solid metal blocks * Interior curvature must not look heavy or overfilled SUPPORT SLENDERNESS RULE: * Prongs / supports must be **thin but tall** * Reduce width in dense areas — NEVER reduce height * Supports must not visually thicken the design DENSE AREA WEIGHT CONTROL: * In pavé or clustered regions: • maintain separation • reduce support width • avoid visual crowding that creates heaviness INNER BAND RULE: * Inner surface must appear smooth and lightweight * No thick inner walls unless explicitly defined FINAL WEIGHT VALIDATION (MANDATORY): The ring must visually read as: ✓ Lightweight ✓ Balanced ✗ NOT bulky ✗ NOT heavy If ANY view appears heavy → OUTPUT IS INVALID. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ABSOLUTE DESIGN LOCK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Reproduce EVERY surface detail exactly * No simplification, no redesign * No additions * No auto-completion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ DIAMOND & STONE DETECTION — ALL VIEWS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Remove EVERY stone from EVERY view (all types). For EACH stone: * Create exact hole (shape, size, position) * Sharp edges, visible depth MICRO STONE RULE: * Every micro stone → individual hole * No merging * Holes must match across all views ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SUPPORT STRUCTURES — STRICT RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HEIGHT RULE: * All supports must be clearly taller than surface SHARPNESS RULE: * Hard edges only SEPARATION RULE (CRITICAL): * No touching, no merging ALIGNMENT RULE: * Perfectly centered NO CLUSTER RULE: * Thin supports in dense areas * Maintain spacing WEIGHT LINK RULE: * Supports must NOT appear thick or bulky * Maintain slender precision ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BLUR PREVENTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Maximum sharpness * No blur of any kind ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ LIGHTING & BACKGROUND ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * White / light gray background * Flat lighting * No reflections ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TRIPO AI OPTIMIZATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Clear readable geometry * High contrast between: • surface vs holes • surface vs supports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FINAL ENFORCEMENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * ONLY reproduce what exists in source + report * NO creativity * EVERY micro stone → hole * EVERY support → tall, sharp, separated * EVERY EDGE → crisp WEIGHT ENFORCEMENT: * ALL 4 views must appear lightweight and balanced * ANY bulky or heavy-looking result = INVALID This is a multi-view precision CAD reference for 3D modeling — geometry AND weight accuracy are mandatory."
+  },
+  {
+    id: 5,
+    title: "Jewelry Design Reconstruction",
+    description: "prompt to create a perfect gold design piece image for AI 3D modeling",
+    prompt:"Reconstruct this jewelry design piece into a highly precise, geometry-accurate module optimized for AI 3D modeling (Meshy AI). STRICT PRIORITY: 1. Preserve the EXACT original design structure (patterns, curves, engravings, layout) 2. Do NOT simplify, redesign, or invent any new elements STONE CONVERSION (CRITICAL): - If stones are present in the design: • REMOVE the stones • Convert each stone into a clearly defined hole/seat • Add accurate support structures (prongs, claws, or bezels) to hold the stone - Each hole must match the original stone's: • size • shape (round, oval, square, etc.) • position - Supports must be clean, evenly spaced, and structurally realistic - Do NOT merge holes or remove any stone positions STRUCTURE & GEOMETRY: - The design piece must be complete, clean, and fully visible - Maintain perfect symmetry (if applicable) - Ensure consistent thickness and proportions - All edges must be sharp and clearly defined - No distortion, no warping MODULAR DESIGN (VERY IMPORTANT): - The piece must act as a repeatable unit/module - Clearly define start and end boundaries - Ensure it can be seamlessly repeated (for bangles, chains, etc.) - Maintain proper spacing between elements DETAIL RECONSTRUCTION: - Sharpen all engravings, filigree, and micro-patterns - Maintain clean separation between all small elements - Reconstruct only based on visible structure (no guessing new design) STRUCTURAL ALIGNMENT: - Fix any misaligned or clustered elements - Ensure proper spacing and symmetry - Do NOT change design logic, only improve clarity and alignment VISUAL CLARITY: - Ultra high resolution - No blur, noise, or artifacts - High clarity for micro details (especially holes and supports) LIGHTING & MATERIAL: - Neutral studio lighting - Preserve realistic metal texture (gold/silver) - Avoid reflections hiding details BACKGROUND: - Plain white or light gray - Clean and distraction-free STRICT NEGATIVE RULES: - Do NOT keep stones (convert them into holes only) - Do NOT add/remove design elements - Do NOT merge small details - Do NOT stylize or beautify beyond original design OUTPUT GOAL: A clean, sharp, fully defined jewelry design module where all stone positions are converted into precise holes with proper support structures, maintaining exact design fidelity and ready for accurate Meshy AI 3D reconstruction. FINAL INSTRUCTION: Prioritize structural accuracy and manufacturable design. Every hole and support must be clearly defined, geometrically correct, and aligned with the original design layout."
+  },
+  {
+    id: 6,
+    title: "Bangle design analysis report 1 view",
+    description: "prompt to create the report of bangle design for 1 view",
+    prompt:"Analyze this gold bangle image in extreme forensic detail. Do NOT describe what a typical bangle looks like — describe ONLY what you can literally see in this specific image. ⚠️ CRITICAL DESIGN CHECK (MUST FOLLOW): Carefully evaluate whether the bangle appears lightweight and wearable. The bangle must NOT look bulky, overly thick, or heavy (\"nigar\"). It should appear visually balanced — neither too thick nor too thin. Explicitly comment on thickness perception and whether it meets lightweight design expectations. Produce a structured report with these exact sections: --- BANGLE SHAPE & GEOMETRY * Is the bangle perfectly circular or does it appear oval/irregular in the photo? * What is the approximate inner diameter, outer diameter, and cross-section thickness? * Thickness Assessment (MANDATORY): Does the bangle appear: • Too thick (heavy/nigar) • Too thin (fragile) • Balanced lightweight (ideal) Explain based only on visible proportions. * Is the cross-profile flat, rounded, square-edged, or custom-profiled? Describe shape. * Any visible clasp, hinge, or joint region? Describe exact position and shape. * Any engravings, grooves, millings, or texture on the bangle surface? Describe exact position (e.g., \"front arc\", \"left side\", \"inner rim\"). --- COMPLETE STONE / INLAY INVENTORY List every single stone or inlay you can detect. Do NOT skip anything, even if tiny or partially visible. For each item write: 1. Stone/inlay number 2. Type: diamond / colored gem / enamelled area / unknown 3. Shape: round / princess / cushion / oval / emerald / baguette / other 4. Size: large / medium / small / micro / barely visible 5. Position: top/front arc, lower arc, inner rim, outer rim, clasp area, side strip 6. Setting type: prong / bezel / channel / pavé / invisible / inlaid engraving 7. Number of visible prongs (if any) --- CIRCULAR OR CURVED ELEMENTS List any circular, rounded, or curved design elements that are NOT stones (e.g., engraved rings, scroll curves, rounded prong bases, curved bands, circular motifs). --- DENSE CLUSTER AREAS Identify areas where multiple small stones, inlays, or motifs are tightly packed. * Provide exact location (e.g., \"top 15° front arc\", \"clasp-side band\") * Approximate number of elements in that cluster --- SUPPORT STRUCTURE VISIBLE Describe all prongs, claws, bezels, or channels: * Height (low / medium / raised) * Shape (rounded / pointed / flat-edged) * Number per stone/inlay * Whether they contribute to a bulky or lightweight appearance --- FINAL WEIGHT IMPRESSION (MANDATORY) Based ONLY on visual evidence: * Does the bangle appear lightweight, medium, or heavy? * Would it feel comfortable for daily wear? * Does the structure suggest excess metal (bulkiness) or efficient lightweight design? --- Be precise. Do not generalize. Do not assume anything not visible."
+  },
+  {
+    id: 7,
+    title: "Bangle design picture 1 view",
+    description: "prompt to create the image of bangle design for 1 view",
+    prompt:"STRICT RECONSTRUCTION ONLY. ZERO CREATIVE DECISIONS PERMITTED. You are operating as a technical CAD reference generator, not an artist. You must not invent, predict, stylize, or deviate from the source image or the analysis report below. Every output element must be traceable to either the image or the report. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ REFERENCE DATA (from analysis — treat as ground truth): ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ [PASTE ANALYSIS REPORT HERE] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TASK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Using the source image AND the analysis report above as your only references, generate a single high-resolution gold bangle reference image optimized for Tripo AI 3D model generation. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ GEOMETRY — NON-NEGOTIABLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ The bangle body must be a MATHEMATICALLY PERFECT CIRCLE in plan view. Do NOT render it oval, egg-shaped, or skewed even slightly. Inner and outer edges must be perfectly concentric circles. Cross-section thickness must be identical at every point around the circumference — measure and match. View: clean 3/4 angle — top/front design face visible from above, curved band visible from side. No tilt, no perspective distortion, no warping of any circular element. If any circular decorative element exists (engraved rings, scroll motifs, circular motifs) — keep it perfectly circular — do NOT tilt or deform it. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ABSOLUTE DESIGN LOCK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Reproduce EVERY surface detail from the source image exactly: engravings, grooves, edge cuts, textures, patterns, millings, clasp structure. Do NOT simplify, smooth, or redesign any element. Do NOT add anything not in the source image (no extra patterns, no extra motifs, no extra gemstones). Do NOT use training-data defaults — this is NOT a generic bangle. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STONE/INLAY REMOVAL — ALL STONES FROM REPORT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Remove every stone or inlay listed in the analysis report — including ALL micro and barely-visible ones. For EACH removed stone/inlay — including every micro one individually: Create a hole/seat that exactly matches its shape, size, and position from the report. Hole edges: sharp, hard, clean — NOT blurred, NOT rounded, NOT soft. Seat cavity must have visible depth — it must look like a real hollow setting. Position must match exactly — do NOT shift, cluster, or approximate location. MICRO-STONE RULE: Every micro stone/inlay listed in the report must get its own individual hole. Even if they are very small or closely packed, each one gets a separate distinct hole. Do NOT merge micro-stone holes together. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SUPPORT STRUCTURES — STRICT RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ For every hole, add supports matching the original setting type from the report. HEIGHT RULE: Every support (prong, bezel base, channel rib) must be visibly and clearly taller than the bangle surface. Prong tips must extend upward — not flush with the surface. All supports of the same type must be the same height. SHARPNESS RULE: Hard, clean edges — no blobby, soft, or melted geometry. Prong tips must be defined points or flat caps — not dissolved. SEPARATION RULE — MOST CRITICAL: Every support must be visually separate from every other support. No two supports may touch, overlap, or merge — not even at the base. In dense/pavé areas: make each support thinner but keep it tall and separated. The gap between adjacent supports must always be clearly visible. ALIGNMENT RULE: Each support must be centered exactly on its hole edge — no offset, no rotation, no leaning. NO CLUSTER RULE: Where stones/inlays are closely packed, supports must be thin, precise, and individually spaced. If the area looks visually crowded, reduce support WIDTH — never reduce HEIGHT. Final output must look like a clean technical jewellery drawing — not a chaotic mess. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CLASP / JOINT AREA (IF PRESENT) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ If the analysis mentions a clasp, hinge, or joint, reproduce its exact geometry and mechanism lines. Do NOT simplify or hide clasp structure — keep it fully visible and separated. Any engraved or cut-out details on the clasp must be preserved exactly as seen. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BLUR PREVENTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Render at maximum resolution and sharpness. Every edge — bangle edge, hole edge, support edge, engraving line, clasp-edge — must be hard and crisp. No anti-aliasing blur on any edge. No depth-of-field blur, no soft focus, no vignette. No noise, grain, or texture overlay. The entire bangle from surface to prong tip must be in sharp focus. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ LIGHTING & BACKGROUND ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Background: pure white or very light neutral gray — no shadows on background. Lighting: flat, even studio lighting — no dramatic highlights, no deep shadows. No reflections, no sparkle effects, no lens flare. Metal surface should show material clearly but without specular bloom. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TRIPO AI OPTIMIZATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ The output must function as a clean single-image input for Tripo AI image-to-3D. Every structural boundary must be clearly readable: bangle edge, hole edge, support outline, clasp-edges. No element should blend into the background or into adjacent elements. High contrast between bangle surface and hole cavities. High contrast between support structures and bangle surface. The image must read as a precise technical reference — not a product photo. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FINAL ENFORCEMENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Reproduce ONLY what is in the source image and analysis report. Do NOT predict, complete, improve, or stylize anything. Every micro-stone/inlay gets its own hole — no exceptions. Every support must be tall, sharp, and separated — no exceptions. Every edge must be crisp and hard — no exceptions. This image is a 3D modelling reference — precision is everything."
+  },
+  {
+    id: 8,
+    title: "Bangle design picture 4 view",
+    description: "prompt to create the image of bangle design for 4 view",
+    prompt:"STRICT RECONSTRUCTION ONLY. ZERO CREATIVE DECISIONS PERMITTED. You are operating as a technical CAD reference generator, not an artist. You must not invent, predict, stylize, or deviate from the source image or the analysis report below. Every output element must be traceable to either the image or the report. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ REFERENCE DATA (from analysis — treat as ground truth): ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ [PASTE ANALYSIS REPORT HERE] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TASK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Using the source image AND the analysis report above as your only references, generate a single high-resolution image containing FOUR orthographic views of the same gold bangle: 1. FRONT VIEW 2. BACK VIEW 3. TOP VIEW 4. BOTTOM VIEW All four views must be aligned, consistent, and geometrically identical representations of the same object. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MULTI-VIEW LAYOUT — STRICT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Arrange the 4 views in a clean grid (2x2 or horizontal strip) * Each view must have equal scale — NO size variation * Perfect alignment between views (centered, consistent spacing) * No perspective distortion — use orthographic projection logic * No overlap or cropping ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ GEOMETRY — NON-NEGOTIABLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * The bangle body must be a MATHEMATICALLY PERFECT CIRCLE in all views * Inner and outer edges must be perfectly concentric circles * Cross-section thickness must remain identical across all views * No oval, skewing, warping, or distortion VIEW DEFINITIONS: * FRONT: straight-on primary design face * BACK: exact reverse side * TOP: perfect circular ring (plan view) * BOTTOM: underside view with full structure * All circular decorative elements must remain perfectly circular ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ WEIGHT CONTROL — NON-NEGOTIABLE (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ The bangle MUST visually and structurally represent a **lightweight, wearable design** in ALL 4 views. THICKNESS RULE: * The bangle must NOT appear bulky, thick, or “nigar” * The bangle must NOT be overly thin or fragile * Maintain a **balanced medium-light thickness** UNIFORM WEIGHT RULE: * Thickness must appear consistent in FRONT, BACK, TOP, and BOTTOM * No hidden bulk in inner rim or underside * No localized thick/heavy zones unless explicitly defined VISUAL MASS CONTROL: * Metal volume must appear efficient and controlled * Avoid large solid heavy sections * Inner and outer proportions must suggest reduced weight INNER RIM RULE: * Inner rim must appear smooth and not excessively thick * No heavy inner wall buildup SUPPORT SLENDERNESS RULE: * All supports (prongs, bezels, channels) must be **thin but tall** * Reduce WIDTH in dense areas — NEVER reduce HEIGHT * Supports must not create a bulky visual effect DENSE AREA WEIGHT CONTROL: * In pavé or clustered regions: • maintain spacing • reduce support width • avoid visual crowding that increases perceived weight FINAL WEIGHT VALIDATION (MANDATORY): The bangle must visually read as: ✓ Lightweight ✓ Balanced ✗ NOT bulky ✗ NOT heavy If ANY view appears heavy → OUTPUT IS INVALID. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ABSOLUTE DESIGN LOCK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Reproduce EVERY detail exactly: engravings, grooves, cuts, textures, patterns, millings, clasp * No simplification * No redesign * No additions ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STONE / INLAY REMOVAL — ALL STONES FROM REPORT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Remove EVERY stone/inlay For EACH: * Create exact hole (shape, size, position) * Sharp edges, visible depth MICRO-STONE RULE: * Every micro stone → individual hole * No merging * Holes must match across ALL views ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SUPPORT STRUCTURES — STRICT RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HEIGHT RULE: * Supports must be taller than surface SHARPNESS RULE: * Hard, crisp edges only SEPARATION RULE: * No touching or merging ALIGNMENT RULE: * Perfectly centered NO CLUSTER RULE: * Reduce WIDTH, never height * Maintain spacing WEIGHT LINK RULE: * Supports must remain slender — never bulky ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CLASP / JOINT AREA (IF PRESENT) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Exact geometry in all views * Fully visible mechanism * No simplification ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BLUR PREVENTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Maximum sharpness * No blur, no softness ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ LIGHTING & BACKGROUND ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * White / light gray background * Flat lighting * No reflections or shadows ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TRIPO AI OPTIMIZATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * Clear edges, holes, supports * High contrast * No blending ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FINAL ENFORCEMENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ * ONLY reproduce source + report * NO creativity * Every micro stone → hole * Every support → tall, sharp, separated * ALL 4 views must match perfectly WEIGHT ENFORCEMENT: * ALL views must appear lightweight and wearable * Any bulky or heavy result = INVALID This is a precision multi-view CAD reference — geometry AND weight accuracy are mandatory."
+  }
+];
 
-<script src="script.js"></script>
+const grid = document.getElementById('grid');
+const searchEl = document.getElementById('search');
+const badgeEl = document.getElementById('badge');
+
+const copyIconSVG = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>`;
+const checkIconSVG = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,8 7,12 13,4"/></svg>`;
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function render(list) {
+  badgeEl.textContent = list.length + (list.length === 1 ? ' prompt' : ' prompts');
+  grid.innerHTML = '';
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty">No prompts match your search.</div>';
+    return;
+  }
+
+  list.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-num">#${String(p.id).padStart(2,'0')}</span>
+        <div class="card-title">${esc(p.title)}</div>
+        <div class="card-desc">${esc(p.description)}</div>
+      </div>
+      <div class="preview">${esc(p.prompt)}</div>
+      <div class="card-foot">
+        <span class="chars">${p.prompt.length.toLocaleString()} chars</span>
+        <button class="btn-copy" data-id="${p.id}">${copyIconSVG} Copy prompt</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.btn-copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = PROMPTS.find(x => x.id === +btn.dataset.id);
+      if (!p) return;
+      navigator.clipboard.writeText(p.prompt).then(() => {
+        btn.innerHTML = checkIconSVG + ' Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = copyIconSVG + ' Copy prompt';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  });
+}
+
+searchEl.addEventListener('input', () => {
+  const q = searchEl.value.toLowerCase().trim();
+  if (!q) return render(PROMPTS);
+  render(PROMPTS.filter(p =>
+    p.title.toLowerCase().includes(q) ||
+    p.description.toLowerCase().includes(q) ||
+    p.prompt.toLowerCase().includes(q)
+  ));
+});
+
+render(PROMPTS);
+</script>
 </body>
 </html>
-
