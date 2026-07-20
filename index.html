@@ -266,43 +266,7 @@ const PROMPTS = [
     id: 1,
     title: "The Deep Backend Context Architect",
     description: "",
-    prompt:{`You are a Principal Backend Solutions Architect and Cyber-Security Engineer. 
-
-Your objective is to generate an ultra-deep, production-grade, hyper-detailed Markdown Context System for an AI Developer Agent to build a 100% secure, scalable backend framework based on my raw application ideas. Do not use placeholders, generic bullet points, or hand-waving shortcuts like "// TODO". Write out every single structure, data contract, and rule in complete detail.
-
-Analyze my app data and output the exact text contents for the following backend files:
-
-### File 1: `.context/backend-prd.md` (Granular Functional Specifications)
-- Targeted Users & Roles: Break down system roles (e.g., Guest, Authenticated User, Organization Admin, System Super-Admin) and their precise capabilities.
-- Core Logical Features: Detail the background processes, cron jobs, third-party integrations (webhooks, email triggers, queues), and data processing loops down to the minor validation steps.
-- Strict Business Boundaries: List exactly what data transitions are illegal (e.g., "A user cannot change their organization_id after creation").
-
-### File 2: `.context/backend-architecture.md` (Folder Layout, DB Schemas & Tech Stack)
-- Definitively choose the best stack (e.g., Node.js/TypeScript with NestJS or Next.js Server Actions, PostgreSQL with Prisma, Redis for caching).
-- Complete Directory Blueprint: Map out a nested folder structure indicating exactly where Controllers, Services, Middleware, Repositories, Validations, and DTOs (Data Transfer Objects) live.
-- Hardcore DB Schema Specs: Write out the exact SQL/Prisma schema strings for every single table, including field types, foreign keys, constraints, indexes, and cascades.
-
-### File 3: `.context/backend-security-rules.md` (The Ironclad Guardrails)
-- Rule-Based Restrictions: Explicitly command the AI to never bypass validation. All inputs must use a validation library (Zod/Joi).
-- Authentication & Authorization: Detail JWT/Session expiration handling, secure cookie configs (HttpOnly, Secure, SameSite), and RBAC (Role-Based Access Control) middleware logic.
-- API Protection Rules: Specify rate limiting thresholds (e.g., max 100 requests per 15 mins per IP), CORS configurations, input sanitization against SQL Injection/XSS, and a unified global error-handling wrapper contract.
-
-### File 4: `.context/backend-routes.md` (Full Payload & API Contracts)
-- Map out every single API Route or Server Action endpoint. For EVERY single route without exception, write the exact structural schema for:
-  1. HTTP Method & Path (e.g., `POST /api/v1/auth/register`)
-  2. Request Body / Query Params (Full TypeScript interfaces with type assignments)
-  3. Response Status 200/201 Payload (The complete exact JSON output structure)
-  4. Response Error Status 400/401/403/500 Payloads (Exact JSON structure showing error keys and message formats)
-
-### File 5: `.context/backend-phases.md` (Atomic Database & Logic Roadmap)
-- Break the backend building process into hyper-focused, sequential phases (e.g., Phase 1: DB Schema & Migration, Phase 2: Auth Logic & Encryption, Phase 3: Core CRUD Operations, Phase 4: Integrations & Webhooks).
-
-### File 6: `.context/backend-memory.md` (Save State Entry Point)
-- Initialize the system memory file marking Phase 1 as active and defining what needs to be checked first.
-
-Output each file clearly wrapped inside its own markdown code fence block so I can save them immediately. Here is my raw data:
-
-[PASTE YOUR RAW IDEA, DATABASE VISIONS, AND APIS HERE]`}
+    prompt:"hello?"
    
   },
    {
